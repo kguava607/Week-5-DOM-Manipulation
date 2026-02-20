@@ -1,133 +1,149 @@
-function getEl(id) {
-  return document.getElementById(id);
-}
+// 10_js.js
 
-function showOnlyOnePanel(panelToShowId) {
-  const filterForm = getEl("filterContent");
-  const newForm = getEl("newContent");
+// Hide both panels when the page loads (requirement: menus appear when buttons are clicked)
+window.onload = function () {
+  document.getElementById("filterContent").style.display = "none";
+  document.getElementById("newContent").style.display = "none";
 
-  if (panelToShowId === "filterContent") {
+  // Apply filtering based on the default checkbox states on load
+  filterArticles();
+};
 
-    const isVisible = filterForm.style.display !== "none";
-    filterForm.style.display = isVisible ? "none" : "block";
+// Toggle filter menu
+function showFilter() {
+  var filterForm = document.getElementById("filterContent");
+  var newForm = document.getElementById("newContent");
 
-    newForm.style.display = "none";
-  } else if (panelToShowId === "newContent") {
+  // Hide add form if open
+  newForm.style.display = "none";
 
-    const isVisible = newForm.style.display !== "none";
-    newForm.style.display = isVisible ? "none" : "flex";
-
+  // Toggle filter form
+  if (filterForm.style.display === "none") {
+    filterForm.style.display = "block";
+  } else {
     filterForm.style.display = "none";
   }
 }
 
-function applySingleFilter(articleClass, shouldShow) {
-  const articles = document.querySelectorAll("article." + articleClass);
-  for (const a of articles) {
-    a.style.display = shouldShow ? "" : "none";
+// Toggle add-new form
+function showAddNew() {
+  var filterForm = document.getElementById("filterContent");
+  var newForm = document.getElementById("newContent");
+
+  // Hide filter form if open
+  filterForm.style.display = "none";
+
+  // Toggle new form
+  if (newForm.style.display === "none") {
+    // Your CSS uses flex layout for this form
+    newForm.style.display = "flex";
+  } else {
+    newForm.style.display = "none";
   }
 }
 
-function getSelectedType() {
-  const opinion = getEl("opinionRadio");
-  const recipe = getEl("recipeRadio");
-  const life = getEl("lifeRadio");
-
-  if (opinion && opinion.checked) return { cls: "opinion", label: "Opinion" };
-  if (recipe && recipe.checked) return { cls: "recipe", label: "Recipe" };
-  if (life && life.checked) return { cls: "update", label: "Update" }; // matches your CSS class
-  return null;
-}
-
-function getNextArticleNumber() {
-  const all = document.querySelectorAll("#articleList article");
-  return all.length + 1;
-}
-
-function showFilter() {
-  showOnlyOnePanel("filterContent");
-}
-
-function showAddNew() {
-  showOnlyOnePanel("newContent");
-}
-
+// Filter articles based on checkboxes
 function filterArticles() {
-  const opinionChecked = getEl("opinionCheckbox").checked;
-  const recipeChecked = getEl("recipeCheckbox").checked;
-  const updateChecked = getEl("updateCheckbox").checked;
+  var showOpinion = document.getElementById("opinionCheckbox").checked;
+  var showRecipe = document.getElementById("recipeCheckbox").checked;
+  var showUpdate = document.getElementById("updateCheckbox").checked;
 
-  applySingleFilter("opinion", opinionChecked);
-  applySingleFilter("recipe", recipeChecked);
-  applySingleFilter("update", updateChecked);
+  // opinion
+  var opinionArticles = document.querySelectorAll("article.opinion");
+  for (var i = 0; i < opinionArticles.length; i++) {
+    opinionArticles[i].style.display = showOpinion ? "" : "none";
+  }
+
+  // recipe
+  var recipeArticles = document.querySelectorAll("article.recipe");
+  for (var j = 0; j < recipeArticles.length; j++) {
+    recipeArticles[j].style.display = showRecipe ? "" : "none";
+  }
+
+  // update
+  var updateArticles = document.querySelectorAll("article.update");
+  for (var k = 0; k < updateArticles.length; k++) {
+    updateArticles[k].style.display = showUpdate ? "" : "none";
+  }
 }
 
+// Add a new article to the list with correct styles
 function addNewArticle() {
-  const titleInput = getEl("inputHeader");
-  const textInput = getEl("inputArticle");
+  var titleValue = document.getElementById("inputHeader").value.trim();
+  var textValue = document.getElementById("inputArticle").value.trim();
 
-  const title = (titleInput.value || "").trim();
-  const text = (textInput.value || "").trim();
-  const type = getSelectedType();
+  // Determine type from radios
+  var typeClass = "";
+  var typeLabel = "";
 
-  if (!title) {
+  if (document.getElementById("opinionRadio").checked) {
+    typeClass = "opinion";
+    typeLabel = "Opinion";
+  } else if (document.getElementById("recipeRadio").checked) {
+    typeClass = "recipe";
+    typeLabel = "Recipe";
+  } else if (document.getElementById("lifeRadio").checked) {
+    typeClass = "update";
+    typeLabel = "Update";
+  }
+
+  // Basic validation (simple + slide-friendly)
+  if (titleValue === "") {
     alert("Please enter a title.");
     return;
   }
-  if (!type) {
+  if (typeClass === "") {
     alert("Please choose an article type.");
     return;
   }
-  if (!text) {
+  if (textValue === "") {
     alert("Please enter article text.");
     return;
   }
 
-s
-  const article = document.createElement("article");
-  article.className = type.cls;
-  article.id = "a" + getNextArticleNumber();
+  // Create article node
+  var newArticle = document.createElement("article");
+  newArticle.classList.add(typeClass);
 
-  const marker = document.createElement("span");
-  marker.className = "marker";
-  marker.textContent = type.label;
+  // Marker (styled by your CSS)
+  var marker = document.createElement("span");
+  marker.classList.add("marker");
+  marker.innerText = typeLabel;
 
-  const h2 = document.createElement("h2");
-  h2.textContent = title;
+  // Title
+  var h2 = document.createElement("h2");
+  h2.innerText = titleValue;
 
-  const pText = document.createElement("p");
-  pText.textContent = text;
+  // Text
+  var pText = document.createElement("p");
+  pText.innerText = textValue;
 
-  const pLink = document.createElement("p");
-  const link = document.createElement("a");
-  link.href = "moreDetails.html";
-  link.textContent = "Read more...";
-  pLink.appendChild(link);
+  // Read more link (matches your existing articles)
+  var pLink = document.createElement("p");
+  var a = document.createElement("a");
+  a.href = "moreDetails.html";
+  a.innerText = "Read more...";
+  pLink.appendChild(a);
 
-  article.appendChild(marker);
-  article.appendChild(h2);
-  article.appendChild(pText);
-  article.appendChild(pLink);
+  // Build structure
+  newArticle.appendChild(marker);
+  newArticle.appendChild(h2);
+  newArticle.appendChild(pText);
+  newArticle.appendChild(pLink);
 
- 
-  getEl("articleList").appendChild(article);
+  // Add to list
+  document.getElementById("articleList").appendChild(newArticle);
 
+  // Clear inputs
+  document.getElementById("inputHeader").value = "";
+  document.getElementById("inputArticle").value = "";
+  document.getElementById("opinionRadio").checked = false;
+  document.getElementById("recipeRadio").checked = false;
+  document.getElementById("lifeRadio").checked = false;
 
-  titleInput.value = "";
-  textInput.value = "";
-  getEl("opinionRadio").checked = false;
-  getEl("recipeRadio").checked = false;
-  getEl("lifeRadio").checked = false;
+  // Hide the add form after adding (common expectation in your sample flow)
+  document.getElementById("newContent").style.display = "none";
 
-  getEl("newContent").style.display = "none";
-
+  // Make sure the new article follows the current filter checkbox states
   filterArticles();
 }
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  getEl("filterContent").style.display = "none";
-  getEl("newContent").style.display = "none";
-
-  filterArticles();
-});
